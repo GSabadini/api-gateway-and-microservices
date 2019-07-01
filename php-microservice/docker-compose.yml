@@ -1,0 +1,11 @@
+version: '3'
+services:
+  slim-example:
+    image: comicrelief/php-slim
+    volumes:
+      - ./:/var/www/html
+    ports:
+      - "3002:80"
+    environment:
+      APPLICATION_ENV: local
+ 
