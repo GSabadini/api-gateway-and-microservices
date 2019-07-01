@@ -1,0 +1,10 @@
+version: "3"
+
+services:
+  node-microservice:
+    build: .
+    command: npm start
+    ports:
+      - "3003:3003"
+    volumes:
+      - .:/home/gfacina/lab-api-gateway-and-microservices/node-microservice

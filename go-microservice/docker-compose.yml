@@ -1,0 +1,10 @@
+version: "3"
+
+services:
+  go-microservice:
+    build: .
+    ports:
+      - "3001:3001"
+    command: fresh
+    volumes:
+      - .:/home/gfacina/lab-api-gateway-and-microservices/go-microservice

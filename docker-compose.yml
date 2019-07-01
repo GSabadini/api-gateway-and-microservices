@@ -1,0 +1,52 @@
+version: "3"
+
+services:
+  api-gateway:
+    build: ./api-gateway
+    command: npm start
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./api-gateway:/home/gfacina/lab-api-gateway-and-microservices/api-gateway
+    networks:
+      - backend
+
+  go-microservice:
+    build: ./go-microservice
+    ports:
+      - "3001:3001"
+    command: fresh
+    volumes:
+      - ./go-microservice:/home/gfacina/lab-api-gateway-and-microservices/go-microservice
+    networks:
+      - backend
+
+  node-microservice:
+    build: ./node-microservice
+    command: npm start
+    ports:
+      - "3003:3003"
+    volumes:
+      - ./node-microservice:/home/gfacina/lab-api-gateway-and-microservices/node-microservice
+    networks:
+      - backend
+      - web 
+
+  reverse-proxy:
+    image: traefik
+    command: --api --docker
+    ports:
+      - "80:80"    
+      - "8080:8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+
+  whoami:
+    image: containous/whoami
+    labels:
+      - "traefik.frontend.rule=Host:whoami.docker.localhost"
+
+networks:
+  backend:
+  web:
+    external: true

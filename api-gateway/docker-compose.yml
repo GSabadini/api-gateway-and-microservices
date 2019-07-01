@@ -1,0 +1,10 @@
+version: "3"
+
+services:
+  api-gateway:
+    build: .
+    command: npm start
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/home/gfacina/lab-api-gateway-and-microservices/api-gateway
