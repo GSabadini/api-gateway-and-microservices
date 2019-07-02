@@ -7,4 +7,4 @@ services:
       - "3001:3001"
     command: fresh
     volumes:
-      - .:/home/gfacina/lab-api-gateway-and-microservices/go-microservice
+      - .:/go-microservice

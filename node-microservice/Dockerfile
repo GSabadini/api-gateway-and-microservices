@@ -1,6 +1,6 @@
 FROM node:alpine
 
-WORKDIR /home/gfacina/lab-api-gateway-and-microservices/node-microservice
+WORKDIR /node-microservice
 
 COPY package*.json ./
 RUN npm install
