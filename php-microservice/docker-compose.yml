@@ -1,11 +1,18 @@
-version: '3'
+version: "3"
+
 services:
-  slim-example:
-    image: comicrelief/php-slim
-    volumes:
-      - ./:/var/www/html
+  nginx:
+    build:
+      context: .
+      dockerfile: ./docker/web/nginx/Dockerfile
     ports:
-      - "3002:80"
-    environment:
-      APPLICATION_ENV: local
+      - 80
+    depends_on:
+      - php-microservice
+
+  php-microservice:
+    build:
+      context: .
+      dockerfile: ./docker/web/php/Dockerfile
+
  

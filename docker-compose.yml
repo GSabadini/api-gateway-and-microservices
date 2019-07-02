@@ -2,37 +2,56 @@ version: "3"
 
 services:
   api-gateway:
+    container_name: api-gateway
     build: ./api-gateway
+    image: api-gateway:latest
     command: npm start
     ports:
       - "3000:3000"
     volumes:
-      - ./api-gateway:/home/gfacina/lab-api-gateway-and-microservices/api-gateway
-    networks:
-      - backend
+      - ./api-gateway:/api-gateway
+    links:
+      - go-microservice
+      - node-microservice
+      - python-microservice
 
   go-microservice:
+    container_name: go-microservice
     build: ./go-microservice
+    image: go-microservice:latest
     ports:
       - "3001:3001"
     command: fresh
     volumes:
-      - ./go-microservice:/home/gfacina/lab-api-gateway-and-microservices/go-microservice
-    networks:
-      - backend
+      - ./go-microservice:/go-microservice
 
   node-microservice:
+    container_name: node-microservice
     build: ./node-microservice
+    image: node-microservice:latest
     command: npm start
     ports:
       - "3003:3003"
     volumes:
-      - ./node-microservice:/home/gfacina/lab-api-gateway-and-microservices/node-microservice
-    networks:
-      - backend
-      - web 
+      - ./node-microservice:/node-microservice
+
+  python-microservice:
+    container_name: python-microservice
+    build: ./python-microservice
+    image: python-microservice:latest
+    ports:
+      - "5000:5000"
+    volumes:
+      - .:/code
+    environment:
+      FLASK_ENV: development
+
+  redis:
+    container_name: redis
+    image: "redis:alpine"
 
   reverse-proxy:
+    container_name: traefik
     image: traefik
     command: --api --docker
     ports:
@@ -42,11 +61,11 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
 
   whoami:
+    container_name: whoami
     image: containous/whoami
     labels:
       - "traefik.frontend.rule=Host:whoami.docker.localhost"
 
 networks:
-  backend:
   web:
     external: true

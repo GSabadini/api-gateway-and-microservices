@@ -7,4 +7,4 @@ services:
     ports:
       - "3003:3003"
     volumes:
-      - .:/home/gfacina/lab-api-gateway-and-microservices/node-microservice
+      - .:/node-microservice

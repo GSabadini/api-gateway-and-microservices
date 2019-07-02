@@ -2,16 +2,18 @@
   "name": "node-microservice",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "index-koa.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon index.js"
+    "start": "nodemon index-koa.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
     "express": "^4.17.1",
+    "koa": "^2.7.0",
+    "morgan": "^1.9.1",
     "nodemon": "^1.19.1"
   }
 }
