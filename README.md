@@ -1,13 +1,13 @@
-Api Gateway:
+#Api Gateway:
     - Node.js
 
-Microservices:
+#Microservices:
     - GoLang
     - Node.js
     - Php
     - Python
     - Ruby
 
-Infra:
+#Infra:
     - Docker
     - Docker-compose
