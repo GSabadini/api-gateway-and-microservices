@@ -11,6 +11,7 @@
 # Infra:
     - Docker
     - Docker-compose
+    - Docker Swarm
     
 # Queue:
     - RabbitMQ
@@ -20,3 +21,11 @@
     
 # Logs:
     - Elastic Stack
+ 
+# Monitoring:
+    - Prometheus
+    - Grafana
+    - AlertManager
+    - Netdata
+    - cAdvisor
+    - Node_Exporter
