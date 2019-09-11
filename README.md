@@ -11,3 +11,12 @@
 # Infra:
     - Docker
     - Docker-compose
+    
+# Queue:
+    - RabbitMQ
+    
+# Cache:
+    - Redis
+    
+# Logs:
+    - Elastic Stack
