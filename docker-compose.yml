@@ -1,4 +1,4 @@
-version: "3"
+version: "3.2"
 
 services:
   api-gateway:
@@ -50,30 +50,30 @@ services:
     container_name: redis
     image: "redis:alpine"
 
-  reverse-proxy:
-    container_name: traefik
-    image: traefik
-    command: --api --docker
-    ports:
-      - "80:80"    
-      - "8080:8080"
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
+  # reverse-proxy:
+  #   container_name: traefik
+  #   image: traefik
+  #   command: --api --docker
+  #   ports:
+  #     - "80:80"    
+  #     - "8080:8080"
+  #   volumes:
+  #     - /var/run/docker.sock:/var/run/docker.sock
 
-  whoami:
-    container_name: whoami
-    image: containous/whoami
-    labels:
-      - "traefik.frontend.rule=Host:whoami.docker.localhost"
+  # whoami:
+  #   container_name: whoami
+  #   image: containous/whoami
+  #   labels:
+  #     - "traefik.frontend.rule=Host:whoami.docker.localhost"
 
   elasticsearch:
     build:
-      context: elasticsearch/
+      context: ./elk/elasticsearch
       args:
         ELK_VERSION: $ELK_VERSION
     volumes:
       - type: bind
-        source: ./elasticsearch/config/elasticsearch.yml
+        source: ./elk/elasticsearch/config/elasticsearch.yml
         target: /usr/share/elasticsearch/config/elasticsearch.yml
         read_only: true
       - type: volume
@@ -90,12 +90,12 @@ services:
 
   logstash:
     build:
-      context: logstash/
+      context: ./elk/logstash/
       args:
         ELK_VERSION: $ELK_VERSION
     volumes:
       - type: bind
-        source: ./logstash/config/logstash.yml
+        source: ./elk/logstash/config/logstash.yml
         target: /usr/share/logstash/config/logstash.yml
         read_only: true
       - type: bind
@@ -114,12 +114,12 @@ services:
 
   kibana:
     build:
-      context: kibana/
+      context: ./elk/kibana/
       args:
         ELK_VERSION: $ELK_VERSION
     volumes:
       - type: bind
-        source: ./kibana/config/kibana.yml
+        source: ./elk/kibana/config/kibana.yml
         target: /usr/share/kibana/config/kibana.yml
         read_only: true
     ports:
@@ -129,11 +129,78 @@ services:
     depends_on:
       - elasticsearch
 
+  prometheus:
+    image: linuxtips/prometheus_alpine
+    volumes:
+      - ./conf/prometheus/:/etc/prometheus/
+      - prometheus_data:/var/lib/prometheus
+    networks:
+      - backend
+    ports:
+      - 9090:9090
+
+  node-exporter:
+    image: linuxtips/node-exporter_alpine
+    hostname: '{{.Node.ID}}'
+    volumes:
+      - /proc:/usr/proc
+      - /sys:/usr/sys
+      - /:/rootfs
+    deploy:
+      mode: global
+    networks:
+      - backend
+    ports:
+      - 9100:9100
+
+  alertmanager:
+    image: linuxtips/alertmanager_alpine
+    volumes:
+      - ./conf/alertmanager/:/etc/alertmanager/
+    networks:
+      - backend
+    ports:
+      - 9093:9093
+
+  cadvisor:
+    image: google/cadvisor
+    hostname: '{{.Node.ID}}'
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:rw
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+      - backend
+    deploy:
+      mode: global
+    ports:
+      - 8080:8080
+
+  grafana:
+    image: grafana/grafana
+    depends_on:
+      - prometheus
+    volumes:
+      - grafana_db:/var/lib/grafana
+    env_file:
+      - grafana.config
+    networks:
+      - backend
+      - frontend
+    ports:
+      - 3000:3000
+
 volumes:
   elasticsearch:
+  prometheus_data:
+  grafana_data:
 
 networks:
-  web:
-    external: true
+  frontend:
+  backend:
+  # web:
+  #   external: true
   elk:
     driver: bridge
