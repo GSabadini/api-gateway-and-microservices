@@ -1,54 +1,54 @@
-version: "3.2"
+version: "3.3"
 
 services:
-  api-gateway:
-    container_name: api-gateway
-    build: ./api-gateway
-    image: api-gateway:latest
-    command: npm start
-    ports:
-      - "3000:3000"
-    volumes:
-      - ./api-gateway:/api-gateway
-    links:
-      - go-microservice
-      - node-microservice
-      - python-microservice
+  # api-gateway:
+  #   container_name: api-gateway
+  #   build: ./api-gateway
+  #   image: api-gateway:latest
+  #   command: npm start
+  #   ports:
+  #     - "3000:3000"
+  #   volumes:
+  #     - ./api-gateway:/api-gateway
+  #   links:
+  #     - go-microservice
+  #     - node-microservice
+  #     - python-microservice
 
-  go-microservice:
-    container_name: go-microservice
-    build: ./go-microservice
-    image: go-microservice:latest
-    ports:
-      - "3001:3001"
-    command: fresh
-    volumes:
-      - ./go-microservice:/go-microservice
+  # go-microservice:
+  #   container_name: go-microservice
+  #   build: ./go-microservice
+  #   image: go-microservice:latest
+  #   ports:
+  #     - "3001:3001"
+  #   command: fresh
+  #   volumes:
+  #     - ./go-microservice:/go-microservice
 
-  node-microservice:
-    container_name: node-microservice
-    build: ./node-microservice
-    image: node-microservice:latest
-    command: npm start
-    ports:
-      - "3003:3003"
-    volumes:
-      - ./node-microservice:/node-microservice
+  # node-microservice:
+  #   container_name: node-microservice
+  #   build: ./node-microservice
+  #   image: node-microservice:latest
+  #   command: npm start
+  #   ports:
+  #     - "3003:3003"
+  #   volumes:
+  #     - ./node-microservice:/node-microservice
 
-  python-microservice:
-    container_name: python-microservice
-    build: ./python-microservice
-    image: python-microservice:latest
-    ports:
-      - "5000:5000"
-    volumes:
-      - .:/code
-    environment:
-      FLASK_ENV: development
+  # python-microservice:
+  #   container_name: python-microservice
+  #   build: ./python-microservice
+  #   image: python-microservice:latest
+  #   ports:
+  #     - "5000:5000"
+  #   volumes:
+  #     - .:/code
+  #   environment:
+  #     FLASK_ENV: development
 
-  redis:
-    container_name: redis
-    image: "redis:alpine"
+  # redis:
+  #   container_name: redis
+  #   image: "redis:alpine"
 
   # reverse-proxy:
   #   container_name: traefik
@@ -66,73 +66,73 @@ services:
   #   labels:
   #     - "traefik.frontend.rule=Host:whoami.docker.localhost"
 
-  elasticsearch:
-    build:
-      context: ./elk/elasticsearch
-      args:
-        ELK_VERSION: $ELK_VERSION
-    volumes:
-      - type: bind
-        source: ./elk/elasticsearch/config/elasticsearch.yml
-        target: /usr/share/elasticsearch/config/elasticsearch.yml
-        read_only: true
-      - type: volume
-        source: elasticsearch
-        target: /usr/share/elasticsearch/data
-    ports:
-      - "9200:9200"
-      - "9300:9300"
-    environment:
-      ES_JAVA_OPTS: "-Xmx256m -Xms256m"
-      ELASTIC_PASSWORD: changeme
-    networks:
-      - elk
+  # elasticsearch:
+  #   build:
+  #     context: ./elk/elasticsearch
+  #     args:
+  #       ELK_VERSION: $ELK_VERSION
+  #   volumes:
+  #     - type: bind
+  #       source: ./elk/elasticsearch/config/elasticsearch.yml
+  #       target: /usr/share/elasticsearch/config/elasticsearch.yml
+  #       read_only: true
+  #     - type: volume
+  #       source: elasticsearch
+  #       target: /usr/share/elasticsearch/data
+  #   ports:
+  #     - "9200:9200"
+  #     - "9300:9300"
+  #   environment:
+  #     ES_JAVA_OPTS: "-Xmx256m -Xms256m"
+  #     ELASTIC_PASSWORD: changeme
+  #   networks:
+  #     - elk
 
-  logstash:
-    build:
-      context: ./elk/logstash/
-      args:
-        ELK_VERSION: $ELK_VERSION
-    volumes:
-      - type: bind
-        source: ./elk/logstash/config/logstash.yml
-        target: /usr/share/logstash/config/logstash.yml
-        read_only: true
-      - type: bind
-        source: ./logstash/pipeline
-        target: /usr/share/logstash/pipeline
-        read_only: true
-    ports:
-      - "5000:5000"
-      - "9600:9600"
-    environment:
-      LS_JAVA_OPTS: "-Xmx256m -Xms256m"
-    networks:
-      - elk
-    depends_on:
-      - elasticsearch
+  # logstash:
+  #   build:
+  #     context: ./elk/logstash/
+  #     args:
+  #       ELK_VERSION: $ELK_VERSION
+  #   volumes:
+  #     - type: bind
+  #       source: ./elk/logstash/config/logstash.yml
+  #       target: /usr/share/logstash/config/logstash.yml
+  #       read_only: true
+  #     - type: bind
+  #       source: ./logstash/pipeline
+  #       target: /usr/share/logstash/pipeline
+  #       read_only: true
+  #   ports:
+  #     - "5000:5000"
+  #     - "9600:9600"
+  #   environment:
+  #     LS_JAVA_OPTS: "-Xmx256m -Xms256m"
+  #   networks:
+  #     - elk
+  #   depends_on:
+  #     - elasticsearch
 
-  kibana:
-    build:
-      context: ./elk/kibana/
-      args:
-        ELK_VERSION: $ELK_VERSION
-    volumes:
-      - type: bind
-        source: ./elk/kibana/config/kibana.yml
-        target: /usr/share/kibana/config/kibana.yml
-        read_only: true
-    ports:
-      - "5601:5601"
-    networks:
-      - elk
-    depends_on:
-      - elasticsearch
+  # kibana:
+  #   build:
+  #     context: ./elk/kibana/
+  #     args:
+  #       ELK_VERSION: $ELK_VERSION
+  #   volumes:
+  #     - type: bind
+  #       source: ./elk/kibana/config/kibana.yml
+  #       target: /usr/share/kibana/config/kibana.yml
+  #       read_only: true
+  #   ports:
+  #     - "5601:5601"
+  #   networks:
+  #     - elk
+  #   depends_on:
+  #     - elasticsearch
 
   prometheus:
     image: linuxtips/prometheus_alpine
     volumes:
-      - ./conf/prometheus/:/etc/prometheus/
+      - ./monitoring/conf/prometheus/:/etc/prometheus/
       - prometheus_data:/var/lib/prometheus
     networks:
       - backend
@@ -156,7 +156,7 @@ services:
   alertmanager:
     image: linuxtips/alertmanager_alpine
     volumes:
-      - ./conf/alertmanager/:/etc/alertmanager/
+      - ./monitoring/conf/alertmanager/:/etc/alertmanager/
     networks:
       - backend
     ports:
@@ -183,9 +183,9 @@ services:
     depends_on:
       - prometheus
     volumes:
-      - grafana_db:/var/lib/grafana
+      - grafana_data:/var/lib/grafana
     env_file:
-      - grafana.config
+      - ./monitoring/grafana.config
     networks:
       - backend
       - frontend
