@@ -6,7 +6,6 @@
     - Node.js
     - Php
     - Python
-    - Ruby
 
 # Database:
     - MySQL
