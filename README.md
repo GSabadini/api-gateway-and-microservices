@@ -8,6 +8,11 @@
     - Python
     - Ruby
 
+# Database:
+    - MySQL
+    - Postgres
+    - MongoDB
+    
 # Infra:
     - Docker
     - Docker-compose
