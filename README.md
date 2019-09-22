@@ -22,6 +22,7 @@
     
 # Cache:
     - Redis
+    - Memcached
     
 # Logs:
     - Elastic Stack
