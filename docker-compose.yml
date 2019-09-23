@@ -103,13 +103,8 @@ services:
       args:
         ELK_VERSION: $ELK_VERSION
     volumes:
-      - type: bind
-        source: ./elk/elasticsearch/config/elasticsearch.yml
-        target: /usr/share/elasticsearch/config/elasticsearch.yml
-        read_only: true
-      - type: volume
-        source: elasticsearch
-        target: /usr/share/elasticsearch/data
+      - ./elk/elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
+      - ./elk/elasticsearch:/usr/share/elasticsearch/data
     ports:
       - "9200:9200"
       - "9300:9300"
@@ -118,7 +113,7 @@ services:
       ELASTIC_PASSWORD: changeme
     networks:
       - elk
-  
+
   logstash:
     container_name: logstash
     build:
@@ -126,14 +121,8 @@ services:
       args:
         ELK_VERSION: $ELK_VERSION
     volumes:
-      - type: bind
-        source: ./elk/logstash/config/logstash.yml
-        target: /usr/share/logstash/config/logstash.yml
-        read_only: true
-      - type: bind
-        source: ./logstash/pipeline
-        target: /usr/share/logstash/pipeline
-        read_only: true
+      - ./elk/logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml
+      - ./elk/logstash/pipeline:/usr/share/logstash/pipeline
     ports:
       - "5001:5001"
       - "9600:9600"
@@ -143,7 +132,7 @@ services:
       - elk
     depends_on:
       - elasticsearch
-  
+
   kibana:
     container_name: kibana
     build:
@@ -151,10 +140,7 @@ services:
       args:
         ELK_VERSION: $ELK_VERSION
     volumes:
-      - type: bind
-        source: ./elk/kibana/config/kibana.yml
-        target: /usr/share/kibana/config/kibana.yml
-        read_only: true
+      - ./elk/kibana/config/kibana.yml:/usr/share/kibana/config/kibana.yml
     ports:
       - "5601:5601"
     networks:
@@ -163,69 +149,73 @@ services:
       - elasticsearch
 
   ######### MONITORING #########
-  # prometheus:
-  # container_name: prometheus
-  #   image: linuxtips/prometheus_alpine
-  #   volumes:
-  #     - ./monitoring/conf/prometheus/:/etc/prometheus/
-  #     - prometheus_data:/var/lib/prometheus
-  #   networks:
-  #     - backend
-  #   ports:
-  #     - 9090:9090
-  # node-exporter:
-  # container_name: node-exporter
-  #   image: linuxtips/node-exporter_alpine
-  #   hostname: "{{.Node.ID}}"
-  #   volumes:
-  #     - /proc:/usr/proc
-  #     - /sys:/usr/sys
-  #     - /:/rootfs
-  #   deploy:
-  #     mode: global
-  #   networks:
-  #     - backend
-  #   ports:
-  #     - 9100:9100
-  # alertmanager:
-  # container_name: alertmanager
-  #   image: linuxtips/alertmanager_alpine
-  #   volumes:
-  #     - ./monitoring/conf/alertmanager/:/etc/alertmanager/
-  #   networks:
-  #     - backend
-  #   ports:
-  #     - 9093:9093
-  # cadvisor:
-  # container_name: cadvisor
-  #   image: google/cadvisor
-  #   hostname: "{{.Node.ID}}"
-  #   volumes:
-  #     - /:/rootfs:ro
-  #     - /var/run:/var/run:rw
-  #     - /sys:/sys:ro
-  #     - /var/lib/docker/:/var/lib/docker:ro
-  #     - /var/run/docker.sock:/var/run/docker.sock:ro
-  #   networks:
-  #     - backend
-  #   deploy:
-  #     mode: global
-  #   ports:
-  #     - 8080:8080
-  # grafana:
-  # container_name: grafana
-  #   image: grafana/grafana
-  #   depends_on:
-  #     - prometheus
-  #   volumes:
-  #     - grafana_data:/var/lib/grafana
-  #   env_file:
-  #     - ./monitoring/grafana.config
-  #   networks:
-  #     - backend
-  #     - frontend
-  #   ports:
-  #     - 3000:3000
+  prometheus:
+    container_name: prometheus
+    image: linuxtips/prometheus_alpine
+    volumes:
+      - ./monitoring/conf/prometheus/:/etc/prometheus/
+      - prometheus_data:/var/lib/prometheus
+    networks:
+      - backend
+    ports:
+      - 9090:9090
+
+  node-exporter:
+    container_name: node-exporter
+    image: linuxtips/node-exporter_alpine
+    hostname: "{{.Node.ID}}"
+    volumes:
+      - /proc:/usr/proc
+      - /sys:/usr/sys
+      - /:/rootfs
+    deploy:
+      mode: global
+    networks:
+      - backend
+    ports:
+      - 9100:9100
+
+  alertmanager:
+    container_name: alertmanager
+    image: linuxtips/alertmanager_alpine
+    volumes:
+      - ./monitoring/conf/alertmanager/:/etc/alertmanager/
+    networks:
+      - backend
+    ports:
+      - 9093:9093
+
+  cadvisor:
+    container_name: cadvisor
+    image: google/cadvisor
+    hostname: "{{.Node.ID}}"
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:rw
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+      - backend
+    deploy:
+      mode: global
+    ports:
+      - 8089:8089
+
+  grafana:
+    container_name: grafana
+    image: grafana/grafana
+    depends_on:
+      - prometheus
+    volumes:
+      - grafana_data:/var/lib/grafana
+    env_file:
+      - ./monitoring/grafana.config
+    networks:
+      - backend
+      - frontend
+    ports:
+      - 3005:3005
 
   ######### QUEUE #########
   rabbitmq:
