@@ -1,206 +1,270 @@
 version: "3.3"
 
 services:
-  # api-gateway:
-  #   container_name: api-gateway
-  #   build: ./api-gateway
-  #   image: api-gateway:latest
-  #   command: npm start
-  #   ports:
-  #     - "3000:3000"
-  #   volumes:
-  #     - ./api-gateway:/api-gateway
-  #   links:
-  #     - go-microservice
-  #     - node-microservice
-  #     - python-microservice
-
-  # go-microservice:
-  #   container_name: go-microservice
-  #   build: ./go-microservice
-  #   image: go-microservice:latest
-  #   ports:
-  #     - "3001:3001"
-  #   command: fresh
-  #   volumes:
-  #     - ./go-microservice:/go-microservice
-
-  # node-microservice:
-  #   container_name: node-microservice
-  #   build: ./node-microservice
-  #   image: node-microservice:latest
-  #   command: npm start
-  #   ports:
-  #     - "3003:3003"
-  #   volumes:
-  #     - ./node-microservice:/node-microservice
-
-  # python-microservice:
-  #   container_name: python-microservice
-  #   build: ./python-microservice
-  #   image: python-microservice:latest
-  #   ports:
-  #     - "5000:5000"
-  #   volumes:
-  #     - .:/code
-  #   environment:
-  #     FLASK_ENV: development
-
-  # redis:
-  #   container_name: redis
-  #   image: "redis:alpine"
-
-  # reverse-proxy:
-  #   container_name: traefik
-  #   image: traefik
-  #   command: --api --docker
-  #   ports:
-  #     - "80:80"    
-  #     - "8080:8080"
-  #   volumes:
-  #     - /var/run/docker.sock:/var/run/docker.sock
-
-  # whoami:
-  #   container_name: whoami
-  #   image: containous/whoami
-  #   labels:
-  #     - "traefik.frontend.rule=Host:whoami.docker.localhost"
-
-  # elasticsearch:
-  #   build:
-  #     context: ./elk/elasticsearch
-  #     args:
-  #       ELK_VERSION: $ELK_VERSION
-  #   volumes:
-  #     - type: bind
-  #       source: ./elk/elasticsearch/config/elasticsearch.yml
-  #       target: /usr/share/elasticsearch/config/elasticsearch.yml
-  #       read_only: true
-  #     - type: volume
-  #       source: elasticsearch
-  #       target: /usr/share/elasticsearch/data
-  #   ports:
-  #     - "9200:9200"
-  #     - "9300:9300"
-  #   environment:
-  #     ES_JAVA_OPTS: "-Xmx256m -Xms256m"
-  #     ELASTIC_PASSWORD: changeme
-  #   networks:
-  #     - elk
-
-  # logstash:
-  #   build:
-  #     context: ./elk/logstash/
-  #     args:
-  #       ELK_VERSION: $ELK_VERSION
-  #   volumes:
-  #     - type: bind
-  #       source: ./elk/logstash/config/logstash.yml
-  #       target: /usr/share/logstash/config/logstash.yml
-  #       read_only: true
-  #     - type: bind
-  #       source: ./logstash/pipeline
-  #       target: /usr/share/logstash/pipeline
-  #       read_only: true
-  #   ports:
-  #     - "5000:5000"
-  #     - "9600:9600"
-  #   environment:
-  #     LS_JAVA_OPTS: "-Xmx256m -Xms256m"
-  #   networks:
-  #     - elk
-  #   depends_on:
-  #     - elasticsearch
-
-  # kibana:
-  #   build:
-  #     context: ./elk/kibana/
-  #     args:
-  #       ELK_VERSION: $ELK_VERSION
-  #   volumes:
-  #     - type: bind
-  #       source: ./elk/kibana/config/kibana.yml
-  #       target: /usr/share/kibana/config/kibana.yml
-  #       read_only: true
-  #   ports:
-  #     - "5601:5601"
-  #   networks:
-  #     - elk
-  #   depends_on:
-  #     - elasticsearch
-
-  prometheus:
-    image: linuxtips/prometheus_alpine
-    volumes:
-      - ./monitoring/conf/prometheus/:/etc/prometheus/
-      - prometheus_data:/var/lib/prometheus
-    networks:
-      - backend
+  api-gateway:
+    container_name: api-gateway
+    build: ./api-gateway
+    image: api-gateway:latest
+    command: npm start
     ports:
-      - 9090:9090
-
-  node-exporter:
-    image: linuxtips/node-exporter_alpine
-    hostname: '{{.Node.ID}}'
+      - "3000:3000"
     volumes:
-      - /proc:/usr/proc
-      - /sys:/usr/sys
-      - /:/rootfs
-    deploy:
-      mode: global
-    networks:
-      - backend
-    ports:
-      - 9100:9100
+      - ./api-gateway:/api-gateway
+    links:
+      - go-microservice
+      - node-microservice
+      - python-microservice
+      - php-microservice
 
-  alertmanager:
-    image: linuxtips/alertmanager_alpine
+  ######### GO #########
+  go-microservice:
+    container_name: go-microservice
+    build: ./go-microservice
+    image: go-microservice:latest
+    ports:
+      - "3001:3001"
+    command: fresh
     volumes:
-      - ./monitoring/conf/alertmanager/:/etc/alertmanager/
-    networks:
-      - backend
-    ports:
-      - 9093:9093
+      - ./go-microservice:/go-microservice
 
-  cadvisor:
-    image: google/cadvisor
-    hostname: '{{.Node.ID}}'
+  ######### NODE #########
+  node-microservice:
+    container_name: node-microservice
+    build: ./node-microservice
+    image: node-microservice:latest
+    command: npm start
+    ports:
+      - "3003:3003"
     volumes:
-      - /:/rootfs:ro
-      - /var/run:/var/run:rw
-      - /sys:/sys:ro
-      - /var/lib/docker/:/var/lib/docker:ro
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-    networks:
-      - backend
-    deploy:
-      mode: global
-    ports:
-      - 8080:8080
+      - ./node-microservice:/node-microservice
 
-  grafana:
-    image: grafana/grafana
+  ######### PYTHON #########
+  python-microservice:
+    container_name: python-microservice
+    build: ./python-microservice
+    image: python-microservice:latest
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./python-microservice:/code
+    environment:
+      FLASK_ENV: development
+
+  redis:
+    container_name: redis
+    image: "redis:alpine"
+
+  ######### PHP #########
+  php-microservice:
+    image: ambientum/php:7.3-nginx
+    container_name: php-microservice
     depends_on:
-      - prometheus
+      - mysql
     volumes:
-      - grafana_data:/var/lib/grafana
-    env_file:
-      - ./monitoring/grafana.config
-    networks:
-      - backend
-      - frontend
+      - ./php-microservice/app:/var/www/app
     ports:
-      - 3000:3000
+      - "8081:8080"
+    links:
+      - mysql
+    environment:
+      APP_ENV: local
+      APP_DEBUG: "true"
+      APP_KEY: SomeRandomKey!!!
+      APP_LOCALE: en
+      APP_FALLBACK_LOCALE: en
+      DB_CONNECTION: mysql
+      DB_HOST: db
+      DB_DATABASE: lumen
+      DB_USERNAME: lumen
+      DB_PASSWORD: secret
+      MEMCACHED_HOST: memcached
+      CACHE_DRIVER: memcached
+
+  mysql:
+    container_name: mysql
+    image: mysql
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: secret
+      MYSQL_DATABASE: lumen
+      MYSQL_USER: lumen
+      MYSQL_PASSWORD: secret
+
+  memcached:
+    container_name: memcached
+    image: memcached
+
+  ######### ELASTIC STACK #########
+  elasticsearch:
+    container_name: elasticsearch
+    build:
+      context: ./elk/elasticsearch
+      args:
+        ELK_VERSION: $ELK_VERSION
+    volumes:
+      - type: bind
+        source: ./elk/elasticsearch/config/elasticsearch.yml
+        target: /usr/share/elasticsearch/config/elasticsearch.yml
+        read_only: true
+      - type: volume
+        source: elasticsearch
+        target: /usr/share/elasticsearch/data
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    environment:
+      ES_JAVA_OPTS: "-Xmx256m -Xms256m"
+      ELASTIC_PASSWORD: changeme
+    networks:
+      - elk
+  
+  logstash:
+    container_name: logstash
+    build:
+      context: ./elk/logstash/
+      args:
+        ELK_VERSION: $ELK_VERSION
+    volumes:
+      - type: bind
+        source: ./elk/logstash/config/logstash.yml
+        target: /usr/share/logstash/config/logstash.yml
+        read_only: true
+      - type: bind
+        source: ./logstash/pipeline
+        target: /usr/share/logstash/pipeline
+        read_only: true
+    ports:
+      - "5001:5001"
+      - "9600:9600"
+    environment:
+      LS_JAVA_OPTS: "-Xmx256m -Xms256m"
+    networks:
+      - elk
+    depends_on:
+      - elasticsearch
+  
+  kibana:
+    container_name: kibana
+    build:
+      context: ./elk/kibana/
+      args:
+        ELK_VERSION: $ELK_VERSION
+    volumes:
+      - type: bind
+        source: ./elk/kibana/config/kibana.yml
+        target: /usr/share/kibana/config/kibana.yml
+        read_only: true
+    ports:
+      - "5601:5601"
+    networks:
+      - elk
+    depends_on:
+      - elasticsearch
+
+  ######### MONITORING #########
+  # prometheus:
+  # container_name: prometheus
+  #   image: linuxtips/prometheus_alpine
+  #   volumes:
+  #     - ./monitoring/conf/prometheus/:/etc/prometheus/
+  #     - prometheus_data:/var/lib/prometheus
+  #   networks:
+  #     - backend
+  #   ports:
+  #     - 9090:9090
+  # node-exporter:
+  # container_name: node-exporter
+  #   image: linuxtips/node-exporter_alpine
+  #   hostname: "{{.Node.ID}}"
+  #   volumes:
+  #     - /proc:/usr/proc
+  #     - /sys:/usr/sys
+  #     - /:/rootfs
+  #   deploy:
+  #     mode: global
+  #   networks:
+  #     - backend
+  #   ports:
+  #     - 9100:9100
+  # alertmanager:
+  # container_name: alertmanager
+  #   image: linuxtips/alertmanager_alpine
+  #   volumes:
+  #     - ./monitoring/conf/alertmanager/:/etc/alertmanager/
+  #   networks:
+  #     - backend
+  #   ports:
+  #     - 9093:9093
+  # cadvisor:
+  # container_name: cadvisor
+  #   image: google/cadvisor
+  #   hostname: "{{.Node.ID}}"
+  #   volumes:
+  #     - /:/rootfs:ro
+  #     - /var/run:/var/run:rw
+  #     - /sys:/sys:ro
+  #     - /var/lib/docker/:/var/lib/docker:ro
+  #     - /var/run/docker.sock:/var/run/docker.sock:ro
+  #   networks:
+  #     - backend
+  #   deploy:
+  #     mode: global
+  #   ports:
+  #     - 8080:8080
+  # grafana:
+  # container_name: grafana
+  #   image: grafana/grafana
+  #   depends_on:
+  #     - prometheus
+  #   volumes:
+  #     - grafana_data:/var/lib/grafana
+  #   env_file:
+  #     - ./monitoring/grafana.config
+  #   networks:
+  #     - backend
+  #     - frontend
+  #   ports:
+  #     - 3000:3000
+
+  ######### QUEUE #########
+  rabbitmq:
+    container_name: rabbitmq
+    image: "rabbitmq:3-management"
+    hostname: "rabbit"
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+    labels:
+      NAME: "rabbitmq"
+    volumes:
+      - ./queue/rabbitmq/rabbitmq-isolated.conf:/etc/rabbitmq/rabbitmq.config
+
+  ######### CI/CD #########
+  jenkins:
+    privileged: true
+    image: jenkins:2.60.3-alpine
+    container_name: jenkins
+    user: jenkins
+    volumes:
+      - jenkins_data:/var/jenkins_home
+      - jenkins_data:/home
+      #- /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      JENKINS_HOST_HOME: "/data/jenkins"
+    ports:
+      - "8180:8080"
+      - "8443:8443"
+      - "50000:50000"
 
 volumes:
   elasticsearch:
   prometheus_data:
   grafana_data:
+  jenkins_data:
 
 networks:
   frontend:
   backend:
-  # web:
-  #   external: true
   elk:
     driver: bridge

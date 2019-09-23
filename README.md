@@ -34,3 +34,7 @@
     - Netdata
     - cAdvisor
     - Node_Exporter
+
+# CI/CD
+    - Jenkins
+    - TravisCI

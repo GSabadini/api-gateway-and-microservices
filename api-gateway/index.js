@@ -11,10 +11,14 @@ const app = express();
 const helmet = require('helmet');
 const PORT = 3000;
 
+app.use(helmet());
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
+app.use(cookieParser());
+
 const GoLangServiceProxy = httpProxy('go-microservice:3001');
-const PhpServiceProxy = httpProxy('php-microservice:3002');
+const PhpServiceProxy = httpProxy('php-microservice:8080');
 const NodeJsServiceProxy = httpProxy('node-microservice:3003');
-const RubyServiceProxy = httpProxy('ruby-microservice:3004');
 const PythonServiceProxy = httpProxy('python-microservice:5000');
 
 app.use(logger('combined', { stream: accessLogStream }))
@@ -35,15 +39,6 @@ app.get('/node', (req, res, next) => {
 app.get('/python', (req, res, next) => {
   PythonServiceProxy(req, res, next);
 })
-
-app.get('/ruby', (req, res, next) => {
-  RubyServiceProxy(req, res, next);
-})
-
-app.use(helmet());
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser());
 
 /*var server = http.createServer(app);
 server.listen(PORT, () => console.log('listening'));*/

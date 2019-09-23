@@ -1,0 +1,10 @@
+route:
+   receiver: 'slack'
+
+receivers:
+   - name: 'slack'
+     slack_configs:
+        - send_resolved: true
+          username: 'ALERTS'
+          channel: '#monitoring'
+          api_url: 'https://hooks.slack.com/services/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'
