@@ -37,4 +37,3 @@
 
 # CI/CD
     - Jenkins
-    - TravisCI
